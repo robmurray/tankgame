@@ -1,43 +1,59 @@
 
 (function () {
 	'use strict'
-
-	var worldWidth = 1200;
-	var worldHeight = 1200;
-	var currentX= worldWidth/2;
-	var currentY= worldHeight/2;
-	var velocity=5;
-	var Keys = {
+	
+	var gameConfig ={
+		worldWidth: 1200,
+		worldHeight: 1200,
+		viewerMaxX:400,
+		viewerMaxY:400
+	},
+	Keys = {
 	        up: false,
 	        down: false,
 	        left: false,
 	        right: false
 	    },
-	    ctx = background.getContext('2d'),
+	    viewerBackgroundCTX = background.getContext('2d'),
 	    playerCTX = player.getContext('2d'),
 	    boardCTX = board.getContext('2d'),
 	    dx = 0,
 	    dy = 0,
-	    ptr,
-	    playerPTR;
+	    backgroundPTR,
+	    playerPTR,
+	    currentX,
+	    currentY,
+	    velocity;
+		
+	function initGame(){
+		currentX =gameConfig.worldWidth/2,
+		currentY =gameConfig.worldHeight/2,
+		velocity =5;
+	
+		// draw playarea
+		board.width = gameConfig.viewerMaxX;
+	    board.height = gameConfig.viewerMaxY;
 
-	// create tile
-	ctx.fillStyle = '#2a6d27';
-	ctx.fillRect(0, 0, 50, 50);
-	ctx.fillStyle = 'rgba(255,255,255,0.5)';
-	ctx.fillRect(0, 0, 1, 50);
-	ctx.fillRect(0, 0, 50, 1);
-	ctx.fillStyle = 'rgba(0,0,0,0.5)';
-	ctx.fillRect(0, 39, 50, 1);
-	ctx.fillRect(39, 0, 1, 50);
-	ptr = ctx.createPattern(background, 'repeat');
+		// create tile
+		viewerBackgroundCTX.fillStyle = '#2a6d27';
+		viewerBackgroundCTX.fillRect(0, 0, 50, 50);
+		viewerBackgroundCTX.fillStyle = 'rgba(255,255,255,0.5)';
+		viewerBackgroundCTX.fillRect(0, 0, 1, 50);
+		viewerBackgroundCTX.fillRect(0, 0, 50, 1);
+		viewerBackgroundCTX.fillStyle = 'rgba(0,0,0,0.5)';
+		viewerBackgroundCTX.fillRect(0, 39, 50, 1);
+		viewerBackgroundCTX.fillRect(39, 0, 1, 50);
 
-	background.width =background.height = 400;
-	drawBoard();
-	drawTank("west");
+		backgroundPTR = viewerBackgroundCTX.createPattern(background, 'repeat');
+		background.width =gameConfig.viewerMaxX;
+		background.height = gameConfig.viewerMaxY;
 
-	ctx.fillStyle = ptr;
-	render();
+		drawBoard();
+		drawTank("west");
+
+		viewerBackgroundCTX.fillStyle = backgroundPTR;
+		render();
+	}
 
 	function drawTank(direction){
 	    
@@ -47,8 +63,12 @@
 	    cannonThickness = 11;
 
 	    var rootX,rootY,rootHeight, rootWidth;
-		var playerX = (background.width)/2-(tankWidth/2);
-	    var playerY = (background.height)/2-(tankHeight/2);;
+		var playerX = (gameConfig.viewerMaxX)/2-(tankWidth/2);
+	    var playerY = (gameConfig.viewerMaxY)/2-(tankHeight/2);;
+
+
+	    player.width = gameConfig.viewerMaxX;;
+	    player.height = gameConfig.viewerMaxY;
 
 
 	    if (typeof direction == "undefined"||direction =='') {    
@@ -56,14 +76,6 @@
 	    }
 	    
 
-
-	    player.width = player.height = 400;
-
-	    // add the player
-	    // create tile
-	    
-	    // find the center
-	    
 	    playerCTX.fillStyle = 'red';
 	    playerCTX.fillRect(playerX, playerY, tankWidth,tankHeight);
 	    
@@ -102,36 +114,37 @@
 	function drawBoard(){
 		var borderY,borderX;
 
-	    board.width =board.height = 400;
+	    board.width = gameConfig.viewerMaxX;
+	    board.height = gameConfig.viewerMaxY;
 
 
-	    if(currentY<board.height/2){
+	    if(currentY<gameConfig.viewerMaxY/2){
 	        boardCTX.fillStyle = 'gray';
-	        borderY= board.height/2 -currentY;
+	        borderY= gameConfig.viewerMaxY/2 -currentY;
 	        if(borderY<0){
 	            borderY=0;
 	        }
 	        boardCTX.fillRect(0, 0, 400,borderY);
 	    }
-	    if(currentX<board.width/2){
+	    if(currentX<gameConfig.viewerMaxX/2){
 	        boardCTX.fillStyle = 'gray';
-	        borderX = board.width/2 -currentX;
+	        borderX = gameConfig.viewerMaxX/2 -currentX;
 	        if(borderX<0){
 	            borderX=0;
 	        }
 	        boardCTX.fillRect(0, 0, borderX,400);
 	    }
-	    if(currentX>worldWidth-board.width/2){
+	    if(currentX>gameConfig.worldWidth-gameConfig.viewerMaxX/2){
 	        boardCTX.fillStyle = 'gray';
-	        borderX = currentX-worldWidth+board.width/2;
+	        borderX = currentX-gameConfig.worldWidth+gameConfig.viewerMaxX/2;
 	        if(borderX>400){
 	            borderX=400;
 	        }
 	        boardCTX.fillRect(400-borderX, 0,200+borderX ,400);
 	    }
-	    if(currentY>worldHeight-board.height/2){
+	    if(currentY>gameConfig.worldHeight-gameConfig.viewerMaxY/2){
 	        boardCTX.fillStyle = 'gray';
-	        borderY = currentY-worldHeight+board.height/2;
+	        borderY = currentY-gameConfig.worldHeight+gameConfig.viewerMaxY/2;
 	        if(borderY>400){
 	            borderY=400;
 	        }
@@ -168,21 +181,17 @@
 	    else if (kc === 40) Keys.down = false;
 	};
 
-	var isDirty = false;
-
 	function update(param) {
 	    if (Keys.up) {
 	        
 	        if(currentY>0){
-	            isDirty = true;
 	            dy+=velocity;
 	            currentY-=velocity;
 	        }   
 	    }
 	    else if (Keys.down) {
 	        
-	        if(currentY<worldHeight){
-	            isDirty = true;
+	        if(currentY<gameConfig.worldHeight){
 	            dy-=velocity;
 	            currentY+=velocity;
 	        }   
@@ -191,29 +200,23 @@
 	    if (Keys.left) {
 	        if(currentX>0){
 	            dx+=velocity;
-	            isDirty = true;
 	            currentX-=velocity;
 	        }  
 	    }
 	    else if (Keys.right) {
-	        if(currentX<worldWidth){
+	        if(currentX<gameConfig.worldWidth){
 	            dx-=velocity;
-	            isDirty = true;
 	            currentX+=velocity;
 	        }
 	    }
 
-	    if (isDirty){
-	 	   render();
-		}
-	    //requestAnimationFrame(update);
 	}
 
 	function render(param) {
 	    drawBoard()
-	    ctx.setTransform(1,0,0,1,dx,dy);
-	    ctx.fillRect(-dx, -dy, 400,400);
-	    isDirty= false;
+	    viewerBackgroundCTX.setTransform(1,0,0,1,dx,dy);
+	    viewerBackgroundCTX.fillRect(-dx, -dy, 400,400);
+	   
 
 	}
  	function timestamp() {
@@ -234,11 +237,12 @@
     		dt = dt - step;
     		update(step);
   		}
-  		//render(dt);
+  		render();
+		
   		last = now;
   		requestAnimationFrame(frame);
 	}
-
+	initGame();
 	requestAnimationFrame(frame); 
  
 
