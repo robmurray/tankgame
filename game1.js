@@ -2,6 +2,27 @@
 (function () {
 	'use strict'
 	
+	var KEY_CODE = {
+	    BACKSPACE: 8,
+	    TAB:       9,
+	    RETURN:   13,
+	    ESC:      27,
+	    SPACE:    32,
+	    PAGEUP:   33,
+	    PAGEDOWN: 34,
+	    END:      35,
+	    HOME:     36,
+	    LEFT:     37,
+	    UP:       38,
+	    RIGHT:    39,
+	    DOWN:     40,
+	    INSERT:   45,
+	    DELETE:   46,
+	    ZERO:     48, ONE: 49, TWO: 50, THREE: 51, FOUR: 52, FIVE: 53, SIX: 54, SEVEN: 55, EIGHT: 56, NINE: 57,
+	    A:        65, B: 66, C: 67, D: 68, E: 69, F: 70, G: 71, H: 72, I: 73, J: 74, K: 75, L: 76, M: 77, N: 78, O: 79, P: 80, Q: 81, R: 82, S: 83, T: 84, U: 85, V: 86, W: 87, X: 88, Y: 89, Z: 90,
+	    TILDA:    192
+	  };
+
 	var gameConfig ={
 		worldWidth: 1200,
 		worldHeight: 1200,
@@ -151,34 +172,43 @@
 	        boardCTX.fillRect(0,400-borderY,400,200+borderY);
 	    }
 	}
+/*
+   	function addEvent(obj, type, fn) { 
+   		obj.addEventListener(type, fn, false);    
+   	}
 
-	window.onkeydown = function(e) {
-	    var kc = e.keyCode;
-	    e.preventDefault();
+  	function removeEvent(obj, type, fn) { 
+  		obj.removeEventListener(type, fn, false); 
+  	}
+*/
+  
 
-	    if (kc === 37){
-	        Keys.left = true;
-	        drawTank("west");
-	    } else if (kc === 38){
-	        Keys.up = true;
-	        drawTank("north");
-	    } else if (kc === 39){
-	        Keys.right = true;
-	        drawTank("east");
-	    } else if (kc === 40){
-	        Keys.down = true;
-	        drawTank("south");
-	    }
-	};
-
-	window.onkeyup = function(e) {
-	    var kc = e.keyCode;
-	    e.preventDefault();
-
-	    if (kc === 37) Keys.left = false;
-	    else if (kc === 38) Keys.up = false;
-	    else if (kc === 39) Keys.right = false;
-	    else if (kc === 40) Keys.down = false;
+	function onkey(ev, key, pressed){
+	 	var kc = key;
+		switch(kc) {
+      		case KEY_CODE.LEFT:  
+      			Keys.left = pressed;
+				if(pressed) drawTank("west");
+				ev.preventDefault();
+      			break;
+      		
+      		case KEY_CODE.RIGHT: 
+      			Keys.right = pressed; 
+      			if(pressed) drawTank("east");
+      			ev.preventDefault(); 
+      			break;
+      		case KEY_CODE.UP: 
+      			Keys.up = pressed; 
+      			if(pressed) drawTank("north");
+      			ev.preventDefault(); 
+      			break;
+      		case KEY_CODE.DOWN: 
+      			Keys.down = pressed; 
+      			if(pressed) drawTank("south");
+      			ev.preventDefault(); 
+      			break;
+      		
+    	}  
 	};
 
 	function update(param) {
@@ -213,7 +243,10 @@
 	}
 
 	function render(param) {
-	    drawBoard()
+	    
+	    drawBoard();
+
+	    // move the background
 	    viewerBackgroundCTX.setTransform(1,0,0,1,dx,dy);
 	    viewerBackgroundCTX.fillRect(-dx, -dy, 400,400);
 	   
@@ -244,7 +277,8 @@
 	}
 	initGame();
 	requestAnimationFrame(frame); 
- 
 
+ 	document.addEventListener('keyup', function(ev) { return onkey(ev, ev.keyCode, false);  }, false);
+	document.addEventListener('keydown', function(ev) { return onkey(ev, ev.keyCode, true);  }, false);
 })();
 
