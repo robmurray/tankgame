@@ -1,0 +1,28 @@
+
+html,
+body {
+  height: 100%;
+  background-color: #333;
+}
+body {
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+
+  #gameViewer {
+  	position:relative;
+     width: 400px;
+     height:400px;
+     margin: 0px auto;
+   }
+
+
+.gameCanvas{
+	width=40;
+	height=40;
+	 position:absolute;
+	 left:0px;
+	 top:0px;
+}
